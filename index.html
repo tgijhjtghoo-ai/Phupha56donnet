@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donate - ໂດເນດສະໜັບສະໜູນ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Noto Sans Lao', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="text-slate-100 flex flex-col justify-between min-h-screen">
+
+    <div class="container mx-auto px-4 py-8 max-w-lg">
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <div class="inline-block p-4 rounded-full bg-indigo-600/20 mb-3 border border-indigo-500/30">
+                <i class="fa-solid fa-heart text-4xl text-pink-500 animate-pulse"></i>
+            </div>
+            <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-pink-400">
+                ສະໜັບສະໜູນ / Donate
+            </h1>
+            <p class="text-slate-400 text-sm mt-1">ສະແກນ QR Code ເພື່ອໂດເນດ ແລະ ຝາກຂໍ້ຄວາມໄດ້ເລີຍ</p>
+        </div>
+
+        <!-- QR Display Section -->
+        <div class="glass-card rounded-2xl p-6 text-center shadow-2xl mb-6 relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
+
+            <p class="text-sm text-slate-300 font-medium mb-4">
+                <i class="fa-solid fa-qrcode text-indigo-400 mr-2"></i>ສະແກນຄິວອາໂຄດດ້ານລຸ່ມນີ້
+            </p>
+
+            <div class="bg-white p-4 rounded-xl inline-block shadow-inner mb-3 border-2 border-indigo-500/30">
+                <img src="qr.png" alt="QR Code" class="w-64 h-64 object-contain rounded-lg mx-auto" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=DONATE'">
+            </div>
+
+            <div class="text-xs text-slate-400 flex justify-center items-center gap-2">
+                <i class="fa-solid fa-shield-halved text-emerald-400"></i>
+                <span>ຮອງຮັບ OneBank Kid / ແອັບທະນາຄານທຸກແອັບ</span>
+            </div>
+        </div>
+
+        <!-- Form Section -->
+        <div class="glass-card rounded-2xl p-6 shadow-xl mb-6">
+            <h2 class="text-lg font-semibold text-indigo-300 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-paper-plane"></i>
+                ຝາກຂໍ້ຄວາມໂດເນດ
+            </h2>
+
+            <form id="donateForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">ຊື່ຜູ້ໂດເນດ</label>
+                    <input type="text" id="donorName" placeholder="ໃສ່ຊື່ຂອງທ່ານ..." required
+                        class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">ຂໍ້ຄວາມ / ຄຳອວຍພອນ</label>
+                    <textarea id="donorMessage" rows="3" placeholder="ຝາກຂໍ້ຄວາມເຖິງຂ້ອຍ..." required
+                        class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors resize-none"></textarea>
+                </div>
+
+                <button type="submit" 
+                    class="w-full bg-gradient-to-r from-indigo-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white font-semibold py-3.5 rounded-xl shadow-lg transition-all duration-200 active:scale-95 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-heart"></i>
+                    ສົ່ງຂໍ້ຄວາມໂດເນດ
+                </button>
+            </form>
+        </div>
+
+        <!-- Live Global Supporters List -->
+        <div class="glass-card rounded-2xl p-6 shadow-xl">
+            <h2 class="text-lg font-semibold text-pink-300 mb-4 flex items-center justify-between">
+                <span><i class="fa-solid fa-globe text-pink-400 mr-2"></i>ຂໍ້ຄວາມໂດເນດທຸກຄົນ (Real-time)</span>
+                <span id="totalDonors" class="text-xs bg-pink-500/20 text-pink-300 px-2.5 py-1 rounded-full border border-pink-500/30">0 ທ່ານ</span>
+            </h2>
+
+            <div id="donorList" class="space-y-3 max-h-80 overflow-y-auto pr-1">
+                <p class="text-center text-slate-500 text-sm py-4">ກຳລັງໂຫຼດຂໍ້ມູນ...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK (Modular) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, push, remove, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDgul1-sdfQFrJpd6sgNPwhiEOfu8A4JgE",
+            authDomain: "donnet-47552.firebaseapp.com",
+            projectId: "donnet-47552",
+            storageBucket: "donnet-47552.firebasestorage.app",
+            messagingSenderId: "730744301535",
+            appId: "1:730744301535:web:043de42ee4e56716a9066a",
+            measurementId: "G-NCG1ZBFW4E"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const donationsRef = ref(db, 'donations');
+
+        // Handle Form Submit
+        const donateForm = document.getElementById('donateForm');
+        donateForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('donorName').value.trim();
+            const message = document.getElementById('donorMessage').value.trim();
+
+            if (!name || !message) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ຜິດພາດ',
+                    text: 'ກະລຸນາປ້ອນຊື່ ແລະ ຂໍ້ຄວາມໃຫ້ຄົບຖ້ວນ',
+                    confirmButtonColor: '#4f46e5'
+                });
+                return;
+            }
+
+            // Get exact formatted time (e.g., 5 ພະຈິກ 2026, 19:15)
+            const now = new Date();
+            const timeString = now.toLocaleDateString('lo-LA', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            }) + ' ເວລາ ' + now.toLocaleTimeString('lo-LA', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            push(donationsRef, {
+                name: name,
+                message: message,
+                timestamp: Date.now(),
+                date: timeString
+            }).then(() => {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'ຂອບໃຈຫຼາຍໆ!',
+                    text: 'ຂໍ້ຄວາມໂດເນດຂອງທ່ານຖືກສົ່ງຮຽບຮ້ອຍແລ້ວ',
+                    confirmButtonColor: '#4f46e5'
+                });
+
+                donateForm.reset();
+            }).catch((err) => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ເກີດຂໍ້ຜິດພາດ',
+                    text: err.message,
+                    confirmButtonColor: '#4f46e5'
+                });
+            });
+        });
+
+        // Listen for Real-time Data Updates & Render Delete Button
+        onValue(donationsRef, (snapshot) => {
+            const container = document.getElementById('donorList');
+            const totalElement = document.getElementById('totalDonors');
+
+            if (!snapshot.exists()) {
+                totalElement.innerText = "0 ທ່ານ";
+                container.innerHTML = `<p class="text-center text-slate-500 text-sm py-4">ຍັງບໍ່ມີຂໍ້ມູນການໂດເນດ</p>`;
+                return;
+            }
+
+            const data = snapshot.val();
+            // Convert to array containing unique Firebase key ID
+            const list = Object.keys(data).map(key => ({
+                id: key,
+                ...data[key]
+            })).reverse(); // ໃຫ້ຂໍ້ຄວາມໃໝ່ສຸດຂຶ້ນເທິງ
+
+            totalElement.innerText = `${list.length} ທ່ານ`;
+
+            container.innerHTML = list.map(item => `
+                <div class="bg-slate-800/60 rounded-xl p-3 border border-slate-700/50 flex items-start justify-between gap-2">
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-semibold text-slate-200 text-sm">${escapeHtml(item.name)}</span>
+                            <span class="text-[10px] text-pink-400 bg-pink-500/10 px-2 py-0.5 rounded-md border border-pink-500/20"><i class="fa-regular fa-clock mr-1"></i>${item.date || 'ບໍ່ระบุເວລາ'}</span>
+                        </div>
+                        <p class="text-xs text-slate-300 italic">"${escapeHtml(item.message)}"</p>
+                    </div>
+                    <button onclick="deleteDonation('${item.id}')" class="text-slate-500 hover:text-red-400 p-1 transition-colors" title="ລຶບຂໍ້ຄວາມ">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                </div>
+            `).join('');
+        });
+
+        // Delete Function (Exposed globally to window)
+        window.deleteDonation = function(id) {
+            Swal.fire({
+                title: 'ຕ້ອງການລຶບຂໍ້ຄວາມນີ້ແທ້ບໍ່?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'ລຶບ',
+                cancelButtonText: 'ຍົກເລີກ'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const itemRef = ref(db, `donations/${id}`);
+                    remove(itemRef).then(() => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'ລຶບຮຽບຮ້ອຍແລ້ວ',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    });
+                }
+            });
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/[&<>"']/g, function(m) {
+                return {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                }[m];
+            });
+        }
+    </script>
+</body>
+</html>
